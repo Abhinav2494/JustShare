@@ -3,5 +3,5 @@ target/
 *.iml
 uploads/
 
-
+.env
 application-local.properties
