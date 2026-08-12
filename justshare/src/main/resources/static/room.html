@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Room - JustShare</title>
+
+    <link
+            rel="stylesheet"
+            href="/css/style.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="logo">
+        JustShare
+    </div>
+
+    <div class="nav-text">
+        Sharing Room
+    </div>
+
+</header>
+
+
+<main class="home-container">
+
+
+    <!-- ==================================================
+         ROOM HEADER
+         ================================================== -->
+
+    <section class="hero">
+
+        <p class="badge">
+            SHARING ROOM
+        </p>
+
+        <h1>
+            Room
+            <span id="roomCode">
+                ------
+            </span>
+        </h1>
+
+        <p class="subtitle">
+            Share this room code with another device.
+        </p>
+
+    </section>
+
+
+    <!-- ==================================================
+         ROOM INFORMATION
+         ================================================== -->
+
+    <section class="room-card">
+
+
+        <div class="card-section">
+
+            <h2>
+                Room Code
+            </h2>
+
+            <div class="room-code-box">
+
+                <span id="largeRoomCode">
+                    ------
+                </span>
+
+                <button
+                        id="copyBtn"
+                        class="secondary-btn"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-section">
+
+            <h2>
+                Share URL
+            </h2>
+
+            <div class="join-container">
+
+                <input
+                        type="text"
+                        id="shareUrl"
+                        readonly
+                >
+
+                <button
+                        id="shareBtn"
+                        class="secondary-btn"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-section">
+
+            <h2>
+                Room Information
+            </h2>
+
+            <p id="createdAt"></p>
+
+            <p id="expiresAt"></p>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ==================================================
+         SHARE TEXT
+         ================================================== -->
+
+    <section class="text-share-section">
+
+        <h2>
+            Share Text
+        </h2>
+
+        <textarea
+                id="textInput"
+                placeholder="Type or paste text here..."
+                rows="6"
+        ></textarea>
+
+        <button id="shareTextBtn">
+            Share Text
+        </button>
+
+    </section>
+
+
+    <!-- ==================================================
+         SHARED TEXTS
+         ================================================== -->
+
+    <section class="shared-texts-section">
+
+        <h2>
+            Shared Text
+        </h2>
+
+        <div id="textList"></div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         SHARE FILES
+         ================================================== -->
+
+    <section class="file-share-section">
+
+        <h2>
+            Share Files
+        </h2>
+
+        <div
+                id="dropZone"
+                class="drop-zone"
+        >
+
+            <p>
+                Drag & Drop your file here
+            </p>
+
+            <p>
+                or
+            </p>
+
+            <label
+                    for="fileInput"
+                    class="upload-btn"
+            >
+                Choose File
+            </label>
+
+            <input
+                    type="file"
+                    id="fileInput"
+                    hidden
+            >
+
+        </div>
+
+        <div
+                id="uploadStatus"
+                class="upload-status"
+        ></div>
+
+    </section>
+
+    <!-- ==================================================
+         SHARED FILES
+         ================================================== -->
+
+    <section class="files-section">
+
+        <h2>
+            Shared Files
+        </h2>
+
+        <div id="fileList"></div>
+
+    </section>
+
+
+</main>
+
+
+<script src="/js/room.js"></script>
+
+</body>
+
+</html>
+```
