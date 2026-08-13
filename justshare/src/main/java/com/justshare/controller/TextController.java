@@ -1,4 +1,5 @@
 package com.justshare.controller;
+
 import com.justshare.entity.SharedText;
 import com.justshare.dto.TextResponse;
 import com.justshare.service.EncryptionService;
@@ -24,7 +25,6 @@ public class TextController {
         this.encryptionService = encryptionService;
     }
 
-
     // ==================================================
     // GET ALL TEXTS
     // ==================================================
@@ -49,10 +49,10 @@ public class TextController {
         return ResponseEntity.ok(texts);
     }
 
-
     // ==================================================
     // POST TEXTS
     // ==================================================
+
     @PostMapping
     public ResponseEntity<TextResponse> saveText(
             @PathVariable String roomCode,
