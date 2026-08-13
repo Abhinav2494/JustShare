@@ -1,6 +1,7 @@
 package com.justshare.controller;
 
 import com.justshare.dto.TextResponse;
+import com.justshare.service.EncryptionService;
 import com.justshare.service.TextService;
 
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,16 @@ import java.util.List;
 public class TextController {
 
     private final TextService textService;
+    private final EncryptionService encryptionService;
 
     public TextController(
-            TextService textService
+            TextService textService,
+            EncryptionService encryptionService
     ) {
         this.textService = textService;
+        this.encryptionService = encryptionService;
     }
+
 
     // ==================================================
     // GET ALL TEXTS
@@ -33,7 +38,12 @@ public class TextController {
                 textService
                         .getTexts(roomCode)
                         .stream()
-                        .map(TextResponse::new)
+                        .map(text ->
+                                new TextResponse(
+                                        text,
+                                        encryptionService
+                                )
+                        )
                         .toList();
 
         return ResponseEntity.ok(texts);
