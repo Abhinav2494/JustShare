@@ -1,4 +1,3 @@
-
 /*
  * ============================================================
  * JUSTSHARE - ROOM.JS
@@ -9,18 +8,16 @@
  * 1. Room information
  * 2. Copy room code
  * 3. Copy share URL
- * 4. WebSocket connection
- * 5. Real-time text sharing
- * 6. Loading existing texts
- * 7. Real-time file notifications
- * 8. Loading existing files
- * 9. File upload
- * 10. Upload progress
- * 11. Drag & Drop upload
- * 12. File download
- *
- * NO DELETE FEATURE
- * NO PASSWORD FEATURE
+ * 4. QR code generation
+ * 5. WebSocket connection
+ * 6. Real-time text sharing
+ * 7. Loading existing texts
+ * 8. Real-time file notifications
+ * 9. Loading existing files
+ * 10. File upload
+ * 11. Upload progress
+ * 12. Drag & Drop upload
+ * 13. File download
  *
  * ============================================================
  */
@@ -37,13 +34,18 @@ let stompClient = null;
    GET ROOM CODE
    ============================================================ */
 
-const params = new URLSearchParams(
-    window.location.search
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const roomCode =
+    params.get("code");
+
+console.log(
+    "Room code:",
+    roomCode
 );
-
-const roomCode = params.get("code");
-
-console.log("Room code:", roomCode);
 
 
 /* ============================================================
@@ -52,74 +54,11 @@ console.log("Room code:", roomCode);
 
 if (!roomCode) {
 
-    console.error("Room code is missing.");
+    console.error(
+        "Room code is missing."
+    );
 
     window.location.href = "/";
-}
-
-
-/* ============================================================
-   DOM ELEMENTS
-   ============================================================ */
-
-const roomCodeElement =
-    document.getElementById("roomCode");
-
-const largeRoomCode =
-    document.getElementById("largeRoomCode");
-
-const shareUrl =
-    document.getElementById("shareUrl");
-
-const createdAt =
-    document.getElementById("createdAt");
-
-const expiresAt =
-    document.getElementById("expiresAt");
-
-const copyBtn =
-    document.getElementById("copyBtn");
-
-const shareBtn =
-    document.getElementById("shareBtn");
-
-const textInput =
-    document.getElementById("textInput");
-
-const shareTextBtn =
-    document.getElementById("shareTextBtn");
-
-const textList =
-    document.getElementById("textList");
-
-
-/* ============================================================
-   FILE DOM ELEMENTS
-   ============================================================ */
-
-const fileList =
-    document.getElementById("fileList");
-
-const dropZone =
-    document.getElementById("dropZone");
-
-const fileInput =
-    document.getElementById("fileInput");
-
-const uploadStatus =
-    document.getElementById("uploadStatus");
-
-
-/* ============================================================
-   DISPLAY ROOM CODE
-   ============================================================ */
-
-if (roomCodeElement) {
-    roomCodeElement.textContent = roomCode;
-}
-
-if (largeRoomCode) {
-    largeRoomCode.textContent = roomCode;
 }
 
 
@@ -130,10 +69,176 @@ if (largeRoomCode) {
 const shareUrlValue =
     window.location.origin +
     "/room.html?code=" +
-    roomCode;
+    encodeURIComponent(roomCode);
+
+
+/* ============================================================
+   DOM ELEMENTS
+   ============================================================ */
+
+const roomCodeElement =
+    document.getElementById(
+        "roomCode"
+    );
+
+const largeRoomCode =
+    document.getElementById(
+        "largeRoomCode"
+    );
+
+const shareUrl =
+    document.getElementById(
+        "shareUrl"
+    );
+
+const createdAt =
+    document.getElementById(
+        "createdAt"
+    );
+
+const expiresAt =
+    document.getElementById(
+        "expiresAt"
+    );
+
+const copyBtn =
+    document.getElementById(
+        "copyBtn"
+    );
+
+const shareBtn =
+    document.getElementById(
+        "shareBtn"
+    );
+
+const textInput =
+    document.getElementById(
+        "textInput"
+    );
+
+const shareTextBtn =
+    document.getElementById(
+        "shareTextBtn"
+    );
+
+const textList =
+    document.getElementById(
+        "textList"
+    );
+
+
+/* ============================================================
+   FILE DOM ELEMENTS
+   ============================================================ */
+
+const fileList =
+    document.getElementById(
+        "fileList"
+    );
+
+const dropZone =
+    document.getElementById(
+        "dropZone"
+    );
+
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
+
+const uploadStatus =
+    document.getElementById(
+        "uploadStatus"
+    );
+
+
+/* ============================================================
+   QR CODE
+   ============================================================ */
+
+function generateQRCode() {
+
+    const qrElement =
+        document.getElementById(
+            "qrcode"
+        );
+
+    if (!qrElement) {
+
+        console.warn(
+            "QR code element not found."
+        );
+
+        return;
+    }
+
+    if (
+        typeof QRCode ===
+        "undefined"
+    ) {
+
+        console.error(
+            "QRCode library not loaded."
+        );
+
+        return;
+    }
+
+    /*
+     * Clear previous QR code.
+     */
+
+    qrElement.innerHTML =
+        "";
+
+    /*
+     * Generate QR code.
+     *
+     * Scanning this QR code opens
+     * the current JustShare room.
+     */
+
+    new QRCode(
+        qrElement,
+        {
+            text: shareUrlValue,
+
+            width: 200,
+
+            height: 200,
+
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
+    );
+}
+
+
+/* ============================================================
+   DISPLAY ROOM CODE
+   ============================================================ */
+
+if (roomCodeElement) {
+
+    roomCodeElement.textContent =
+        roomCode;
+}
+
+if (largeRoomCode) {
+
+    largeRoomCode.textContent =
+        roomCode;
+}
+
+
+/* ============================================================
+   DISPLAY SHARE URL
+   ============================================================ */
 
 if (shareUrl) {
-    shareUrl.value = shareUrlValue;
+
+    shareUrl.value =
+        shareUrlValue;
 }
 
 
@@ -144,10 +249,12 @@ if (shareUrl) {
 function formatDate(date) {
 
     if (!date) {
+
         return "N/A";
     }
 
-    return new Date(date).toLocaleString();
+    return new Date(date)
+        .toLocaleString();
 }
 
 
@@ -162,6 +269,7 @@ function formatFileSize(bytes) {
         bytes === undefined ||
         bytes === 0
     ) {
+
         return "0 Bytes";
     }
 
@@ -173,19 +281,25 @@ function formatFileSize(bytes) {
         "TB"
     ];
 
-    const index = Math.floor(
-        Math.log(bytes) / Math.log(1024)
-    );
+    const index =
+        Math.floor(
+            Math.log(bytes) /
+            Math.log(1024)
+        );
 
-    const safeIndex = Math.min(
-        index,
-        units.length - 1
-    );
+    const safeIndex =
+        Math.min(
+            index,
+            units.length - 1
+        );
 
     return (
         (
             bytes /
-            Math.pow(1024, safeIndex)
+            Math.pow(
+                1024,
+                safeIndex
+            )
         ).toFixed(2)
         +
         " " +
@@ -204,15 +318,31 @@ function escapeHtml(value) {
         value === null ||
         value === undefined
     ) {
+
         return "";
     }
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
@@ -226,14 +356,18 @@ async function loadRoom() {
 
         const response =
             await fetch(
-                "/api/rooms/" + roomCode
+                "/api/rooms/" +
+                encodeURIComponent(roomCode)
             );
 
         if (!response.ok) {
 
-            alert("Room does not exist.");
+            alert(
+                "Room does not exist."
+            );
 
-            window.location.href = "/";
+            window.location.href =
+                "/";
 
             return;
         }
@@ -245,14 +379,18 @@ async function loadRoom() {
 
             createdAt.textContent =
                 "Created: " +
-                formatDate(room.createdAt);
+                formatDate(
+                    room.createdAt
+                );
         }
 
         if (expiresAt) {
 
             expiresAt.textContent =
                 "Expires: " +
-                formatDate(room.expiresAt);
+                formatDate(
+                    room.expiresAt
+                );
         }
 
     } catch (error) {
@@ -277,9 +415,10 @@ if (copyBtn) {
 
             try {
 
-                await navigator.clipboard.writeText(
-                    roomCode
-                );
+                await navigator.clipboard
+                    .writeText(
+                        roomCode
+                    );
 
                 copyBtn.textContent =
                     "Copied!";
@@ -322,9 +461,10 @@ if (shareBtn) {
 
             try {
 
-                await navigator.clipboard.writeText(
-                    shareUrlValue
-                );
+                await navigator.clipboard
+                    .writeText(
+                        shareUrlValue
+                    );
 
                 shareBtn.textContent =
                     "Copied!";
@@ -395,121 +535,128 @@ function connectWebSocket() {
     stompClient =
         new StompJs.Client({
 
-            brokerURL: socketUrl,
+            brokerURL:
+                socketUrl,
 
-            reconnectDelay: 5000,
+            reconnectDelay:
+                5000,
 
-            debug: function (message) {
+            debug:
+                function (message) {
 
-                console.log(
-                    "STOMP:",
-                    message
-                );
-            },
+                    console.log(
+                        "STOMP:",
+                        message
+                    );
+                },
 
-            onConnect: function () {
+            onConnect:
+                function () {
 
-                console.log(
-                    "WebSocket connected!"
-                );
+                    console.log(
+                        "WebSocket connected!"
+                    );
 
 
-                /* ====================================================
-                   TEXT SUBSCRIPTION
-                   ==================================================== */
+                    /* ====================================================
+                       TEXT SUBSCRIPTION
+                       ==================================================== */
 
-                stompClient.subscribe(
+                    stompClient.subscribe(
 
-                    "/topic/room/" +
-                    roomCode,
+                        "/topic/room/" +
+                        roomCode,
 
-                    function (message) {
+                        function (message) {
 
-                        try {
+                            try {
 
-                            const text =
-                                JSON.parse(
-                                    message.body
+                                const text =
+                                    JSON.parse(
+                                        message.body
+                                    );
+
+                                addTextToUI(
+                                    text,
+                                    true
                                 );
 
-                            addTextToUI(
-                                text,
-                                true
-                            );
+                            } catch (error) {
 
-                        } catch (error) {
-
-                            console.error(
-                                "Invalid text message:",
-                                error
-                            );
+                                console.error(
+                                    "Invalid text message:",
+                                    error
+                                );
+                            }
                         }
-                    }
-                );
+                    );
 
 
-                /* ====================================================
-                   FILE SUBSCRIPTION
-                   ==================================================== */
+                    /* ====================================================
+                       FILE SUBSCRIPTION
+                       ==================================================== */
 
-                stompClient.subscribe(
+                    stompClient.subscribe(
 
-                    "/topic/room/" +
-                    roomCode +
-                    "/files",
+                        "/topic/room/" +
+                        roomCode +
+                        "/files",
 
-                    function (message) {
+                        function (message) {
 
-                        try {
+                            try {
 
-                            const file =
-                                JSON.parse(
-                                    message.body
+                                const file =
+                                    JSON.parse(
+                                        message.body
+                                    );
+
+                                addFileToUI(
+                                    file,
+                                    true
                                 );
 
-                            addFileToUI(
-                                file,
-                                true
-                            );
+                            } catch (error) {
 
-                        } catch (error) {
-
-                            console.error(
-                                "Invalid file message:",
-                                error
-                            );
+                                console.error(
+                                    "Invalid file message:",
+                                    error
+                                );
+                            }
                         }
-                    }
-                );
+                    );
 
 
-                console.log(
-                    "Room subscriptions created."
-                );
-            },
+                    console.log(
+                        "Room subscriptions created."
+                    );
+                },
 
-            onStompError: function (frame) {
+            onStompError:
+                function (frame) {
 
-                console.error(
-                    "STOMP error:",
-                    frame
-                );
-            },
+                    console.error(
+                        "STOMP error:",
+                        frame
+                    );
+                },
 
-            onWebSocketError: function (error) {
+            onWebSocketError:
+                function (error) {
 
-                console.error(
-                    "WebSocket error:",
-                    error
-                );
-            },
+                    console.error(
+                        "WebSocket error:",
+                        error
+                    );
+                },
 
-            onWebSocketClose: function () {
+            onWebSocketClose:
+                function () {
 
-                console.warn(
-                    "WebSocket closed."
-                );
-            }
+                    console.warn(
+                        "WebSocket closed."
+                    );
+                }
         });
 
     stompClient.activate();
@@ -557,17 +704,22 @@ function shareText() {
 
     stompClient.publish({
 
-        destination: "/app/text",
+        destination:
+            "/app/text",
 
-        body: JSON.stringify({
+        body:
+            JSON.stringify({
 
-            roomCode: roomCode,
+                roomCode:
+                    roomCode,
 
-            content: content
-        })
+                content:
+                    content
+            })
     });
 
-    textInput.value = "";
+    textInput.value =
+        "";
 }
 
 
@@ -595,7 +747,7 @@ async function loadTexts() {
         const response =
             await fetch(
                 "/api/rooms/" +
-                roomCode +
+                encodeURIComponent(roomCode) +
                 "/texts"
             );
 
@@ -610,7 +762,9 @@ async function loadTexts() {
         const texts =
             await response.json();
 
-        renderTexts(texts);
+        renderTexts(
+            texts
+        );
 
     } catch (error) {
 
@@ -632,7 +786,8 @@ function renderTexts(texts) {
         return;
     }
 
-    textList.innerHTML = "";
+    textList.innerHTML =
+        "";
 
     if (
         !texts ||
@@ -640,7 +795,9 @@ function renderTexts(texts) {
     ) {
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         empty.className =
             "empty-texts";
@@ -648,7 +805,9 @@ function renderTexts(texts) {
         empty.textContent =
             "No text shared yet.";
 
-        textList.appendChild(empty);
+        textList.appendChild(
+            empty
+        );
 
         return;
     }
@@ -697,7 +856,9 @@ function addTextToUI(
     }
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     card.className =
         "text-card";
@@ -712,7 +873,9 @@ function addTextToUI(
     /* Content */
 
     const content =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     content.className =
         "text-card-content";
@@ -724,7 +887,9 @@ function addTextToUI(
     /* Time */
 
     const time =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     time.className =
         "text-card-time";
@@ -735,17 +900,28 @@ function addTextToUI(
         );
 
 
-    card.appendChild(content);
-    card.appendChild(time);
+    card.appendChild(
+        content
+    );
 
+    card.appendChild(
+        time
+    );
+
+
+    /* Add card */
 
     if (prepend) {
 
-        textList.prepend(card);
+        textList.prepend(
+            card
+        );
 
     } else {
 
-        textList.appendChild(card);
+        textList.appendChild(
+            card
+        );
     }
 }
 
@@ -821,9 +997,10 @@ function uploadFile(file) {
     const xhr =
         new XMLHttpRequest();
 
+
     const uploadUrl =
         "/api/rooms/" +
-        roomCode +
+        encodeURIComponent(roomCode) +
         "/files";
 
 
@@ -834,13 +1011,18 @@ function uploadFile(file) {
     );
 
 
-    /* Upload progress */
+    /*
+     * Upload progress.
+     */
 
     xhr.upload.addEventListener(
         "progress",
         function (event) {
 
-            if (!event.lengthComputable) {
+            if (
+                !event.lengthComputable
+            ) {
+
                 return;
             }
 
@@ -849,14 +1031,17 @@ function uploadFile(file) {
                     (
                         event.loaded /
                         event.total
-                    ) * 100
+                    ) *
+                    100
                 );
+
 
             if (progressBar) {
 
                 progressBar.style.width =
                     percent + "%";
             }
+
 
             if (percentage) {
 
@@ -867,7 +1052,9 @@ function uploadFile(file) {
     );
 
 
-    /* Upload completed */
+    /*
+     * Upload completed.
+     */
 
     xhr.addEventListener(
         "load",
@@ -877,6 +1064,7 @@ function uploadFile(file) {
                 "Upload response:",
                 xhr.status
             );
+
 
             if (
                 xhr.status >= 200 &&
@@ -889,11 +1077,13 @@ function uploadFile(file) {
                         "100%";
                 }
 
+
                 if (percentage) {
 
                     percentage.textContent =
                         "100%";
                 }
+
 
                 uploadStatus.innerHTML = `
                     <div class="upload-success">
@@ -909,6 +1099,7 @@ function uploadFile(file) {
                     xhr.responseText
                 );
 
+
                 uploadStatus.innerHTML = `
                     <div class="upload-error">
                         ✕ Upload failed
@@ -919,7 +1110,9 @@ function uploadFile(file) {
     );
 
 
-    /* Network error */
+    /*
+     * Network error.
+     */
 
     xhr.addEventListener(
         "error",
@@ -928,6 +1121,7 @@ function uploadFile(file) {
             console.error(
                 "Upload network error"
             );
+
 
             uploadStatus.innerHTML = `
                 <div class="upload-error">
@@ -938,7 +1132,9 @@ function uploadFile(file) {
     );
 
 
-    /* Upload cancelled */
+    /*
+     * Upload cancelled.
+     */
 
     xhr.addEventListener(
         "abort",
@@ -953,7 +1149,9 @@ function uploadFile(file) {
     );
 
 
-    /* FormData */
+    /*
+     * FormData.
+     */
 
     const formData =
         new FormData();
@@ -964,9 +1162,13 @@ function uploadFile(file) {
     );
 
 
-    /* Start upload */
+    /*
+     * Start upload.
+     */
 
-    xhr.send(formData);
+    xhr.send(
+        formData
+    );
 }
 
 
@@ -980,17 +1182,22 @@ if (fileInput) {
         "change",
         function () {
 
-            const file =
-                fileInput.files[0];
+             const files = Array.from(
+                            fileInput.files
+                        );
 
-            uploadFile(file);
+                        if (files.length === 0) {
+                            return;
+                        }
 
-            /*
-             * Allow selecting the same
-             * file again later.
-             */
+                        files.forEach(function (file) {
 
-            fileInput.value = "";
+                            uploadFile(file);
+
+                        });
+
+                        // Allow selecting the same files again
+                        fileInput.value = "";
         }
     );
 }
@@ -1057,14 +1264,15 @@ if (dropZone) {
                 !files ||
                 files.length === 0
             ) {
+
                 return;
             }
 
-            /*
-             * Upload first file.
-             */
+           Array.from(files).forEach(function (file) {
 
-            uploadFile(files[0]);
+               uploadFile(file);
+
+           });
         }
     );
 }
@@ -1090,7 +1298,7 @@ async function loadFiles() {
         const response =
             await fetch(
                 "/api/rooms/" +
-                roomCode +
+                encodeURIComponent(roomCode) +
                 "/files"
             );
 
@@ -1105,7 +1313,9 @@ async function loadFiles() {
         const files =
             await response.json();
 
-        renderFiles(files);
+        renderFiles(
+            files
+        );
 
     } catch (error) {
 
@@ -1127,7 +1337,8 @@ function renderFiles(files) {
         return;
     }
 
-    fileList.innerHTML = "";
+    fileList.innerHTML =
+        "";
 
     if (
         !files ||
@@ -1135,7 +1346,9 @@ function renderFiles(files) {
     ) {
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         empty.className =
             "empty-files";
@@ -1143,7 +1356,9 @@ function renderFiles(files) {
         empty.textContent =
             "No files shared yet.";
 
-        fileList.appendChild(empty);
+        fileList.appendChild(
+            empty
+        );
 
         return;
     }
@@ -1182,6 +1397,10 @@ function addFileToUI(
         file.id ||
         file.fileId;
 
+
+    /*
+     * Require valid file ID.
+     */
 
     if (
         fileId === undefined ||
@@ -1223,6 +1442,7 @@ function addFileToUI(
         );
 
     if (emptyMessage) {
+
         emptyMessage.remove();
     }
 
@@ -1232,7 +1452,9 @@ function addFileToUI(
      */
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     card.className =
         "file-card";
@@ -1246,14 +1468,18 @@ function addFileToUI(
      */
 
     const info =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     info.className =
         "file-info";
 
 
     const name =
-        document.createElement("strong");
+        document.createElement(
+            "strong"
+        );
 
     name.textContent =
         file.originalName ||
@@ -1263,7 +1489,9 @@ function addFileToUI(
 
 
     const size =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     const fileSize =
         file.fileSize ||
@@ -1271,11 +1499,18 @@ function addFileToUI(
         0;
 
     size.textContent =
-        formatFileSize(fileSize);
+        formatFileSize(
+            fileSize
+        );
 
 
-    info.appendChild(name);
-    info.appendChild(size);
+    info.appendChild(
+        name
+    );
+
+    info.appendChild(
+        size
+    );
 
 
     /*
@@ -1283,7 +1518,9 @@ function addFileToUI(
      */
 
     const actions =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     actions.className =
         "file-actions";
@@ -1291,12 +1528,12 @@ function addFileToUI(
 
     /*
      * Download button.
-     *
-     * Everyone can download.
      */
 
     const downloadButton =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
     downloadButton.className =
         "download-btn";
@@ -1306,7 +1543,7 @@ function addFileToUI(
 
     downloadButton.href =
         "/api/rooms/" +
-        roomCode +
+        encodeURIComponent(roomCode) +
         "/files/" +
         fileId +
         "/download";
@@ -1315,6 +1552,7 @@ function addFileToUI(
         "download",
         ""
     );
+
 
     actions.appendChild(
         downloadButton
@@ -1325,8 +1563,13 @@ function addFileToUI(
      * Build card.
      */
 
-    card.appendChild(info);
-    card.appendChild(actions);
+    card.appendChild(
+        info
+    );
+
+    card.appendChild(
+        actions
+    );
 
 
     /*
@@ -1335,11 +1578,15 @@ function addFileToUI(
 
     if (prepend) {
 
-        fileList.prepend(card);
+        fileList.prepend(
+            card
+        );
 
     } else {
 
-        fileList.appendChild(card);
+        fileList.appendChild(
+            card
+        );
     }
 }
 
@@ -1354,10 +1601,11 @@ loadTexts();
 
 loadFiles();
 
+generateQRCode();
+
 connectWebSocket();
 
 
 console.log(
     "room.js initialized successfully."
 );
-

@@ -65,6 +65,8 @@
     </section>
 
 
+
+
     <!-- ==================================================
          ROOM INFORMATION
          ================================================== -->
@@ -90,6 +92,17 @@
                 >
                     Copy
                 </button>
+
+            </div>
+            <div class="qr-section">
+
+                <h3>Scan to Join</h3>
+
+                <div id="qrcode"></div>
+
+                <p>
+                    Scan this QR code to instantly join this room.
+                </p>
 
             </div>
 
@@ -159,27 +172,9 @@
         </button>
 
     </section>
-
-
     <!-- ==================================================
-         SHARED TEXTS
-         ================================================== -->
-
-    <section class="shared-texts-section">
-
-        <h2>
-            Shared Text
-        </h2>
-
-        <div id="textList"></div>
-
-    </section>
-
-
-
-    <!-- ==================================================
-         SHARE FILES
-         ================================================== -->
+        SHARE FILES
+        ================================================== -->
 
     <section class="file-share-section">
 
@@ -200,17 +195,12 @@
                 or
             </p>
 
-            <label
-                    for="fileInput"
-                    class="upload-btn"
-            >
-                Choose File
-            </label>
+
 
             <input
                     type="file"
                     id="fileInput"
-                    hidden
+                    multiple
             >
 
         </div>
@@ -219,6 +209,21 @@
                 id="uploadStatus"
                 class="upload-status"
         ></div>
+
+    </section>
+
+
+    <!-- ==================================================
+         SHARED TEXTS
+         ================================================== -->
+
+    <section class="shared-texts-section">
+
+        <h2>
+            Shared Text
+        </h2>
+
+        <div id="textList"></div>
 
     </section>
 
@@ -238,11 +243,15 @@
 
 
 </main>
+<!-- QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-
+<!-- STOMP -->
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+<!-- Your JavaScript -->
 <script src="/js/room.js"></script>
 
 </body>
 
 </html>
-```
+
