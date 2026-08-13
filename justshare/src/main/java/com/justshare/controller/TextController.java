@@ -1,5 +1,5 @@
 package com.justshare.controller;
-
+import com.justshare.entity.SharedText;
 import com.justshare.dto.TextResponse;
 import com.justshare.service.EncryptionService;
 import com.justshare.service.TextService;
@@ -47,5 +47,29 @@ public class TextController {
                         .toList();
 
         return ResponseEntity.ok(texts);
+    }
+
+
+    // ==================================================
+    // POST TEXTS
+    // ==================================================
+    @PostMapping
+    public ResponseEntity<TextResponse> saveText(
+            @PathVariable String roomCode,
+            @RequestBody String content
+    ) {
+
+        SharedText text =
+                textService.saveText(
+                        roomCode,
+                        content
+                );
+
+        return ResponseEntity.ok(
+                new TextResponse(
+                        text,
+                        encryptionService
+                )
+        );
     }
 }

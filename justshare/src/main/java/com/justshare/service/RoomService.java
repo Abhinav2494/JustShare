@@ -5,6 +5,7 @@ import com.justshare.entity.Room;
 import com.justshare.repository.RoomRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -44,7 +45,7 @@ public class RoomService {
                 LocalDateTime.now();
 
         LocalDateTime expiry =
-                now.plusHours(24);
+                now.plusDays(7);
 
         Room room =
                 new Room(
@@ -114,5 +115,26 @@ public class RoomService {
         }
 
         return code.toString();
+    }
+
+    @Transactional
+    public void deleteExpiredRooms() {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        var expiredRooms =
+                roomRepository.findByExpiresAtBefore(now);
+
+        if (expiredRooms.isEmpty()) {
+            return;
+        }
+
+        roomRepository.deleteAll(expiredRooms);
+
+        System.out.println(
+                "Deleted " +
+                        expiredRooms.size() +
+                        " expired rooms."
+        );
     }
 }
