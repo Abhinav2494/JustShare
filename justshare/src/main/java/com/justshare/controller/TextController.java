@@ -1,5 +1,5 @@
 package com.justshare.controller;
-
+import com.justshare.entity.SharedText;
 import com.justshare.dto.TextResponse;
 import com.justshare.service.EncryptionService;
 import com.justshare.service.TextService;
