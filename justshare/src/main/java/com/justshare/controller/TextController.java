@@ -48,4 +48,28 @@ public class TextController {
 
         return ResponseEntity.ok(texts);
     }
+
+
+     // ==================================================
+    // POST TEXTS
+    // ==================================================
+    @PostMapping
+public ResponseEntity<TextResponse> saveText(
+        @PathVariable String roomCode,
+        @RequestBody String content
+) {
+
+    SharedText text =
+            textService.saveText(
+                    roomCode,
+                    content
+            );
+
+    return ResponseEntity.ok(
+            new TextResponse(
+                    text,
+                    encryptionService
+            )
+    );
+}
 }
